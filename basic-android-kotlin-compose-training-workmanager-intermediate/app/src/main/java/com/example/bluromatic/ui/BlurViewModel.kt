@@ -70,6 +70,13 @@ class BlurViewModel(private val bluromaticRepository: BluromaticRepository) : Vi
     }
 
     /**
+     * Call method from repository to cancel any ongoing WorkRequest
+     * */
+    fun cancelWork() {
+        bluromaticRepository.cancelWork()
+    }
+
+    /**
      * Factory for [BlurViewModel] that takes [BluromaticRepository] as a dependency
      */
     companion object {
@@ -90,3 +97,4 @@ sealed interface BlurUiState {
     object Loading : BlurUiState
     data class Complete(val outputUri: String) : BlurUiState
 }
+

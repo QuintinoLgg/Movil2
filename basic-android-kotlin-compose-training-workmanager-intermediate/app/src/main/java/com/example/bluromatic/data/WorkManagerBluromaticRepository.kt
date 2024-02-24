@@ -83,8 +83,9 @@ class WorkManagerBluromaticRepository(context: Context) : BluromaticRepository {
     /**
      * Cancel any ongoing WorkRequests
      * */
-    override fun cancelWork() {}
-
+    override fun cancelWork() {
+        workManager.cancelUniqueWork(IMAGE_MANIPULATION_WORK_NAME)
+    }
     /**
      * Creates the input data bundle which includes the blur level to
      * update the amount of blur to be applied and the Uri to operate on
