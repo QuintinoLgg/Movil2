@@ -79,11 +79,9 @@ fun BluromaticScreen(blurViewModel: BlurViewModel = viewModel(factory = BlurView
             .fillMaxSize()
             .statusBarsPadding()
             .padding(
-                start = WindowInsets.safeDrawing
-                    .asPaddingValues()
+                start = WindowInsets.safeDrawing.asPaddingValues()
                     .calculateStartPadding(layoutDirection),
-                end = WindowInsets.safeDrawing
-                    .asPaddingValues()
+                end = WindowInsets.safeDrawing.asPaddingValues()
                     .calculateEndPadding(layoutDirection)
             )
     ) {
@@ -127,10 +125,12 @@ fun BluromaticScreenContent(
         BlurActions(
             blurUiState = blurUiState,
             onStartClick = { applyBlur(selectedValue) },
-            onSeeFileClick = {currentUri ->
-                showBlurredImage(context, currentUri)},
+            onSeeFileClick = { currentUri ->
+                showBlurredImage(context, currentUri)
+            },
             onCancelClick = { cancelWork() },
             modifier = Modifier.fillMaxWidth()
+
         )
     }
 }
@@ -149,12 +149,7 @@ private fun BlurActions(
     ) {
         when(blurUiState){
             is BlurUiState.Default -> {
-                Button(
-                    onClick = onStartClick,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.start))
-                }
+                Button(onStartClick) { Text(stringResource(R.string.start)) }
             }
             is BlurUiState.Loading -> {
                 FilledTonalButton(onCancelClick) { Text(stringResource(R.string.cancel_work)) }
@@ -162,12 +157,10 @@ private fun BlurActions(
             }
             is BlurUiState.Complete -> {
                 Button(onStartClick) { Text(stringResource(R.string.start)) }
-                // Add a spacer and the new button with a "See File" label
                 Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_small)))
                 FilledTonalButton({ onSeeFileClick(blurUiState.outputUri) })
                 { Text(stringResource(R.string.see_file)) }
             }
-            else -> {}
         }
     }
 }

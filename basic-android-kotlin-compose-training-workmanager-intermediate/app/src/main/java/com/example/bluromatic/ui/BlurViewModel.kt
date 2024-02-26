@@ -16,6 +16,7 @@
 
 package com.example.bluromatic.ui
 
+import android.icu.util.Output
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -41,24 +42,22 @@ class BlurViewModel(private val bluromaticRepository: BluromaticRepository) : Vi
 
     internal val blurAmount = BlurAmountData.blurAmount
 
-    val blurUiState: StateFlow<BlurUiState> = bluromaticRepository.outputWorkInfo
-        .map { info ->
-            val outputImageUri = info.outputData.getString(KEY_IMAGE_URI)
-            when {
-                info.state.isFinished && !outputImageUri.isNullOrEmpty() -> {
-                    BlurUiState.Complete(outputUri = outputImageUri)
-                }
-                info.state == WorkInfo.State.CANCELLED -> {
-                    BlurUiState.Default
-                }
-                else -> BlurUiState.Loading
+    val blurUiState: StateFlow<BlurUiState> = bluromaticRepository.outputWorkInfo.map {
+        info -> val outputImageUri = info.outputData.getString(KEY_IMAGE_URI)
+        when{
+            info.state.isFinished && !outputImageUri.isNullOrEmpty() -> {
+                BlurUiState.Complete(outputUri = outputImageUri)
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = BlurUiState.Default
-        )
-
+            info.state == WorkInfo.State.CANCELLED -> {
+                BlurUiState.Default
+            }
+            else -> BlurUiState.Loading
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = BlurUiState.Default
+    )
 
     /**
      * Call the method from repository to create the WorkRequest to apply the blur
@@ -67,13 +66,6 @@ class BlurViewModel(private val bluromaticRepository: BluromaticRepository) : Vi
      */
     fun applyBlur(blurLevel: Int) {
         bluromaticRepository.applyBlur(blurLevel)
-    }
-
-    /**
-     * Call method from repository to cancel any ongoing WorkRequest
-     * */
-    fun cancelWork() {
-        bluromaticRepository.cancelWork()
     }
 
     /**
@@ -90,6 +82,9 @@ class BlurViewModel(private val bluromaticRepository: BluromaticRepository) : Vi
             }
         }
     }
+    fun cancelWork() {
+        bluromaticRepository.cancelWork()
+    }
 }
 
 sealed interface BlurUiState {
@@ -97,4 +92,5 @@ sealed interface BlurUiState {
     object Loading : BlurUiState
     data class Complete(val outputUri: String) : BlurUiState
 }
+
 
